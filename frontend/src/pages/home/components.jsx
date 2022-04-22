@@ -34,7 +34,7 @@ export const Button = styled.button`
   min-height: 40px;
   padding: 0 60px;
   border: 2px solid #666;
-  background: #f5b70d;
+  background: #d0b1f2;
   border-radius: 8px;
   cursor: pointer;
 `;

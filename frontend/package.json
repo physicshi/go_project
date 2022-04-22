@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "npx vite",
     "dev": "vite",
     "build": "tsc && vite build --base ./",
     "lint": "eslint --ext .jsx --ext .js --ext .ts --ext .tsx ./src",

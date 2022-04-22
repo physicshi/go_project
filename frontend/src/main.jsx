@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Router, Route, Switch, Redirect } from "react-router";
 import { Home } from "./pages/home";
@@ -9,7 +9,6 @@ import { history } from "./shared/history";
 import { init } from "./initializers";
 import { getWsClient } from "./shared/ws_client";
 import { clientId } from "./initializers/client_id";
-import { createDialog } from "./components/dialog";
 import { showUploadFileSuccessDialog, showUploadTextSuccessDialog } from "./pages/home/components";
 import { http } from "./shared/http";
 import _ from "lodash";
@@ -18,7 +17,7 @@ import { AppContext } from "./shared/app_context";
 
 const theme = {
   borderColor: "#333",
-  highlightColor: "#f5b70d",
+  highlightColor: "#d0b1f2",
 };
 
 const Main = () => {
