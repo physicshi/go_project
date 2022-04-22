@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -52,12 +53,52 @@ func TextsController(c *gin.Context) {
 
 }
 
+// 获取在各个局域网的ip地址，转为json，作为api返回
+func AddressesController(c *gin.Context) {
+	addrs, _ := net.InterfaceAddrs() // 获取所有网络接口
+	var result []string
+	for _, address := range addrs {
+		// 检查ip地址判断是否回环地址
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				result = append(result, ipnet.IP.String())
+			}
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"addresses": result})
+}
+
+func getUploadsDir() (uploads string) {
+	exe, err := os.Executable() // 获取当前执行文件的路径
+	if err != nil {
+		log.Fatal(err)
+	}
+	dir := filepath.Dir(exe) // 获取当前执行文件的目录
+	return filepath.Join(dir, "uploads")
+}
+
+// 网络路径转为本地路径，读取本地文件，写到http响应中
+func UploadsController(c *gin.Context) {
+	if path := c.Param("path"); path != "" {
+		target := filepath.Join(getUploadsDir(), path)
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Transfer-Encoding", "binary")
+		c.Header("Content-Disposition", "attachment; filename="+path)
+		c.Header("Content-Type", "application/octet-stream")
+		c.File(target)
+	} else {
+		c.Status(http.StatusNotFound)
+	}
+}
+
 func main() {
 	go func() {
 		gin.SetMode(gin.ReleaseMode)
 		router := gin.Default()
 		staticFiles, _ := fs.Sub(FS, "frontend/dist")
 		router.StaticFS("/static", http.FS(staticFiles))
+		router.GET("uploads/:path", UploadsController)
+		router.GET("/api/v1/addresses", AddressesController)
 		router.POST("/api/v1/texts", TextsController)
 		router.NoRoute(func(c *gin.Context) {
 			path := c.Request.URL.Path
