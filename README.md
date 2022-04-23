@@ -7,7 +7,7 @@
 
 ## 技术选择
 
-窗口利用 lorca - 利用本地的 Chrome 等浏览器作为 webview
+窗口使用的是 lorca，利用本地的 Chrome 等浏览器作为 webview
 
 - 后端：go，web 框架是 gin
 - 前端：react
