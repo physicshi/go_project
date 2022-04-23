@@ -10,9 +10,7 @@ import (
 )
 
 func main() {
-	go func() {
-		server.RunGinServer()
-	}()
+	go server.RunGinServer()
 
 	var ui lorca.UI
 	ui, _ = lorca.New("http://127.0.0.1:27149/static/index.html", "", 800, 600, "--disable-sync", "--disable-translate")

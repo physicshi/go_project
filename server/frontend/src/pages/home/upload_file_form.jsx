@@ -5,7 +5,7 @@ import {
   showUploadingDialog,
   showUploadFileSuccessDialog,
   uploadFile,
-} from "../../pages/home/components";
+} from "./components";
 import { AppContext } from "../../shared/app_context";
 
 export const UploadFileForm = () => {
