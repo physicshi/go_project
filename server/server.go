@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/physicshi/go_project/server/controller"
+	"github.com/physicshi/go_project/server/ws"
 )
 
 //go:embed frontend/dist/*
@@ -18,7 +19,12 @@ func RunGinServer() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	staticFiles, _ := fs.Sub(FS, "frontend/dist")
+	hub := ws.NewHub()
+	go hub.Run()
 	router.StaticFS("/static", http.FS(staticFiles))
+	router.GET("/ws", func(c *gin.Context) {
+		ws.HttpController(c, hub)
+	})
 	router.POST("/api/v1/files", controller.FilesController)
 	router.GET("/api/v1/qrcodes", controller.QrcodesController)
 	router.GET("/uploads/:path", controller.UploadsController)
