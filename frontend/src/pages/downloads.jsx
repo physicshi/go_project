@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { Center } from "../components/center";
 import { Space } from "../components/space";
 import { useState } from "react";
-import { useRef } from "react";
 import { useEffect } from "react";
 import { http } from "../shared/http";
 import { history } from "../shared/history";
@@ -41,7 +40,7 @@ export const Downloads = () => {
             <svg><use xlinkHref="#icon-file"></use></svg>
             <Space />
             <Center>
-              <Button>点击下载文件</Button>
+              <Button >点击下载文件</Button>
             </Center>
           </a>
         </Center>
@@ -77,9 +76,6 @@ export const Downloads = () => {
 const Picture = styled.img`
   border: 2px solid ${({ theme }) => theme.borderColor};
   margin: 16px;
-`
-const P = styled.p`
-  margin: 8px 0;
 `
 
 const normalizeType = type => {

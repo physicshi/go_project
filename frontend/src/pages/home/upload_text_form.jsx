@@ -16,7 +16,7 @@ export const UploadTextForm = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     showUploadingDialog();
-    const { data: { url } } = await uploadText(text)
+    const { data: { url } } = await uploadText(text) 
     showUploadTextSuccessDialog({
       context, content: (addr) => addr && `http://${addr}:27149/static/downloads?type=text&url=http://${addr + ":27149" + encodeURIComponent(url)}`
     });

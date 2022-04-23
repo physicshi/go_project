@@ -136,6 +136,7 @@ const notifyPc = (response, type) => {
   getWsClient().then(c => {
     c.send({ clientId, type, url: response.data.url })
   })
+  console.log("first", response)
   return response
 }
 export const uploadText = (text) => {

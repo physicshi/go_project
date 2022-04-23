@@ -16,6 +16,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/skip2/go-qrcode"
 	"github.com/zserge/lorca"
 )
 
@@ -50,7 +51,6 @@ func TextsController(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, gin.H{"url": "/" + fullpath}) // 返回文件路径
 	}
-
 }
 
 // 获取在各个局域网的ip地址，转为json，作为api返回
@@ -77,7 +77,7 @@ func getUploadsDir() (uploads string) {
 	return filepath.Join(dir, "uploads")
 }
 
-// 网络路径转为本地路径，读取本地文件，写到http响应中
+// 手机下载文件，网络路径转为本地路径，读取本地文件，写到http响应中
 func UploadsController(c *gin.Context) {
 	if path := c.Param("path"); path != "" {
 		target := filepath.Join(getUploadsDir(), path)
@@ -91,13 +91,56 @@ func UploadsController(c *gin.Context) {
 	}
 }
 
+func QrcodesController(c *gin.Context) {
+	if content := c.Query("content"); content != "" {
+		png, err := qrcode.Encode(content, qrcode.Medium, 256)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.Data(http.StatusOK, "image/png", png)
+	} else {
+		c.Status(http.StatusBadRequest)
+	}
+}
+
+// 类似于TextsController的逻辑
+// 获取go执行文件所在目录，创建uploads目录，拼接uploads目录+随机文件名，写入文件，返回文件路径
+func FilesController(c *gin.Context) {
+	file, err := c.FormFile("raw") // 读取用户上传的文件
+	if err != nil {
+		log.Fatal(err)
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dir := filepath.Dir(exe) // 获取当前执行文件的
+	if err != nil {
+		log.Fatal(err)
+	}
+	filename := uuid.New().String()
+	uploads := filepath.Join(dir, "uploads")
+	err = os.MkdirAll(uploads, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fullpath := path.Join("uploads", filename+filepath.Ext(file.Filename))
+	fileErr := c.SaveUploadedFile(file, filepath.Join(dir, fullpath))
+	if fileErr != nil {
+		log.Fatal(fileErr)
+	}
+	c.JSON(http.StatusOK, gin.H{"url": "/" + fullpath})
+}
+
 func main() {
 	go func() {
 		gin.SetMode(gin.ReleaseMode)
 		router := gin.Default()
 		staticFiles, _ := fs.Sub(FS, "frontend/dist")
 		router.StaticFS("/static", http.FS(staticFiles))
-		router.GET("uploads/:path", UploadsController)
+		router.GET("/api/v1/files", FilesController)
+		router.GET("/api/v1/qrcodes", QrcodesController)
+		router.GET("/uploads/:path", UploadsController)
 		router.GET("/api/v1/addresses", AddressesController)
 		router.POST("/api/v1/texts", TextsController)
 		router.NoRoute(func(c *gin.Context) {
