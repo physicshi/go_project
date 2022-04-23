@@ -138,7 +138,7 @@ func main() {
 		router := gin.Default()
 		staticFiles, _ := fs.Sub(FS, "frontend/dist")
 		router.StaticFS("/static", http.FS(staticFiles))
-		router.GET("/api/v1/files", FilesController)
+		router.POST("/api/v1/files", FilesController)
 		router.GET("/api/v1/qrcodes", QrcodesController)
 		router.GET("/uploads/:path", UploadsController)
 		router.GET("/api/v1/addresses", AddressesController)
@@ -161,11 +161,11 @@ func main() {
 			}
 
 		})
-		router.Run(":8080")
+		router.Run(":27149")
 	}()
 
 	var ui lorca.UI
-	ui, _ = lorca.New("http://127.0.0.1:8080/static/index.html", "", 800, 600, "--disable-sync", "--disable-translate")
+	ui, _ = lorca.New("http://127.0.0.1:27149/static/index.html", "", 800, 600, "--disable-sync", "--disable-translate")
 	// 处理中断、中止信号
 	chSignal := make(chan os.Signal, 1)
 	signal.Notify(chSignal, syscall.SIGINT, syscall.SIGTERM)
